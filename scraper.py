@@ -10,42 +10,53 @@ Original file is located at
 import requests
 from bs4 import BeautifulSoup
 import json
+import time
 
 # ターゲットにする映画館のURL（例として映画.comのイオンシネマ常滑のページ）
-TARGET_URL = "https://eiga.com/theater/23/232001/4170/"
+THEATERS = [
+    {"name": "イオンシネマ常滑", "url": "https://eiga.com/theater/23/232001/4170/"},
+    {"name": "ミッドランドスクエアシネマ", "url": "https://eiga.com/theater/23/230102/4105/"},
+    {"name": "109シネマズ名古屋", "url": "https://eiga.com/theater/23/230102/4104/"}
+]
 
 def fetch_movies():
-    print(f"{TARGET_URL} からデータを取得します...")
+    all_data = []
     # サイトによってはプログラムからのアクセスを弾くため、ブラウザからのアクセスのように装う
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-    response = requests.get(TARGET_URL, headers=headers)
 
-    movie_list = []
+    for theater in THEATERS:
+        print(f"{theater['name']} からデータを取得します...")
+        response = requests.get(theater['url'], headers=headers)
 
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
+        movie_list = []
 
-        # 映画.comの構造に合わせて、作品名が入っているタグを抽出（※サイトの仕様変更で変わる場合があります）
-        # <h2 itemprop="name">...</h2> のような部分を狙い撃ちします
-        titles = soup.select('h2.title-xlarge a')
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'html.parser')
 
-        for t in titles:
-            title_text = t.text.strip()
-            if title_text and title_text not in movie_list:
-                movie_list.append(title_text)
+            # 映画.comの構造に合わせて、作品名が入っているタグを抽出（※サイトの仕様変更で変わる場合があります）
+            # <h2 itemprop="name">...</h2> のような部分を狙い撃ちします
+            titles = soup.select('h2.title-xlarge a')
 
-        print(f"{len(movie_list)}件の映画が見つかりました。")
-    else:
-        print(f"通信エラー: {response.status_code}")
+            for t in titles:
+                title_text = t.text.strip()
+                if title_text and title_text not in movie_list:
+                    movie_list.append(title_text)
 
-    # 取得したリストを movies.json として保存
-    output_data = {
-        "cinema_name": "イオンシネマ常滑",
-        "movies": movie_list
-    }
+            print(f"{len(movie_list)}件の映画が見つかりました。")
+        else:
+            print(f"通信エラー: {response.status_code}")
+
+        # 取得したリストを movies.json として保存
+        # 1つの映画館のデータをまとめる
+        all_data.append({
+            "cinema_name": theater['name'],
+            "movies": movie_list
+        })
+
+        time.sleep(1)
 
     with open("movies.json", "w", encoding="utf-8") as f:
-        json.dump(output_data, f, ensure_ascii=False, indent=2)
+        json.dump(all_data, f, ensure_ascii=False, indent=2)
     print("movies.json に保存しました。")
 
 if __name__ == "__main__":

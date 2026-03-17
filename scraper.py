@@ -14,9 +14,9 @@ import time
 
 # ターゲットにする映画館のURL（例として映画.comのイオンシネマ常滑のページ）
 THEATERS = [
+    {"name": "109シネマズ名古屋", "url": "https://eiga.com/theater/23/230102/4104/"},
     {"name": "イオンシネマ常滑", "url": "https://eiga.com/theater/23/232001/4170/"},
-    {"name": "ミッドランドスクエアシネマ", "url": "https://eiga.com/theater/23/230102/4105/"},
-    {"name": "109シネマズ名古屋", "url": "https://eiga.com/theater/23/230102/4104/"}
+    {"name": "ミッドランドスクエアシネマ", "url": "https://eiga.com/theater/23/230102/4105/"}
 ]
 
 def fetch_movies():

@@ -39,7 +39,7 @@ jobs:
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
-          git add movies.json
+          git add *.json
           # 変更（新しい映画）があった場合のみコミットする
           git diff --quiet && git diff --staged --quiet || git commit -m "映画スケジュールを自動更新しました"
           git push
